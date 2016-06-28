@@ -12,7 +12,7 @@ required = [
 
 setup(
     name='taskcluster-s3-uploader',
-    version='0.2.0',
+    version='0.3.0',
     packages=find_packages(),
     install_requires=required,
     tests_require=required,

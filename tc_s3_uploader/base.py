@@ -6,6 +6,13 @@ from taskcluster.sync import Auth
 
 class TC_S3_Uploader():
     _BUCKET = 'tc-gp-public-31d'
+    # This is a reduced list to simply help out with basic cases
+    _CONTENT_TYPES = [
+        'application/json',
+        'image/png',
+        'text/html',
+        'text/plain',
+    ]
 
     def __init__(self, bucket_prefix, region='us-west-2'):
         '''It helps upload files to a short term storage S3 bucket using TaskCluster auth.'''
@@ -36,9 +43,11 @@ class TC_S3_Uploader():
             aws_session_token=credentials['credentials']['sessionToken'],
         )
 
-    def upload(self, filepath):
+    def upload(self, filepath, content_type='text/plain'):
         '''Upload file to AWS S3 bucket and key specified.'''
         remote_file_path = os.path.join(self.bucket_prefix, filepath.split('/')[-1])
+
+        assert content_type in self._CONTENT_TYPES
 
         with open(filepath, 'r') as file:
             # Upload the file to S3
@@ -47,7 +56,7 @@ class TC_S3_Uploader():
                 Filename=filepath,
                 Bucket=self._BUCKET,
                 Key=remote_file_path,
-                ExtraArgs={'ContentType': "application/json"}
+                ExtraArgs={'ContentType': content_type}
             )
 
         return "https://{}.s3-{}.amazonaws.com/{}".format(
